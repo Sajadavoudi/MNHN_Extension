@@ -1,4 +1,4 @@
-flask
-flask-cors
-openai
-pyzotero
+openai==1.82.0
+Flask @ file:///C:/ci_311/flask_1676436667658/work
+flask-cors==6.0.0
+pyzotero==1.6.11
