@@ -6,7 +6,8 @@ from OpenAI_ThirdLayer import validate_specimen
 from pyzotero import zotero
 
 app = Flask(__name__)
-CORS(app)
+CORS(app)  # Allow requests from Chrome Extension
+
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
@@ -49,35 +50,35 @@ def zotero_push():
 
     try:
         zot = zotero.Zotero(
-            data.get("zotero_library_id", ""),
-            data.get("zotero_type", "user"),
-            data.get("zotero_key", "")
+            data.get("zotero_library_id", "").strip(),
+            data.get("zotero_type", "user").strip(),
+            data.get("zotero_key", "").strip()
         )
 
         tags = []
         for s in data.get("validated_specimens", []):
             for field in [s.get("name", ""), s.get("category", ""), s.get("subcategory", "")]:
-                field = field.strip()
                 if field and field.lower() != "none":
-                    tags.append({"tag": field})
+                    tags.append({"tag": field.strip()})
 
         item = {
             "itemType": "journalArticle",
             "title": data.get("title", "Untitled"),
-            "url": data.get("url", "https://example.com"),
+            "url": data.get("url", "https://mnhn.fr/placeholder-url"),
             "tags": tags,
             "collections": [],
+            "date": data.get("date", "2025-01-01"),
             "DOI": data.get("doi", "n/a"),
             "language": data.get("language", "en"),
             "publicationTitle": data.get("journal_title", "Unknown"),
-            "ISSN": data.get("ISSN", "0000-0000"),
-            "date": data.get("date", "2025-01-01")
+            "ISSN": data.get("ISSN", "0000-0000")
         }
 
         response = zot.create_items([item])
         return jsonify({"status": "success", "response": response})
+
     except Exception as e:
-        print(f"❌ Error pushing to Zotero: {e}")  # Will show in Railway logs
+        print("❌ Zotero push error:", str(e))
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
