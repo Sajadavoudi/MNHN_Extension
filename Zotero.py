@@ -2,11 +2,11 @@ from pyzotero import zotero
 import json
 
 # Zotero API credentials
+"""
 ZOTERO_LIBRARY_ID = "15818985"  # Replace with your Zotero library ID
 ZOTERO_API_KEY = "AJ7jW0HWRUufShR3FeO2717h"  # Replace with your Zotero API key
 ZOTERO_LIBRARY_TYPE = "user"  # Use "group" if working with a Zotero group library
-
-input_json = "hello.json"
+"""
 
 # Initialize Zotero API
 zot = zotero.Zotero(ZOTERO_LIBRARY_ID, ZOTERO_LIBRARY_TYPE, ZOTERO_API_KEY)
