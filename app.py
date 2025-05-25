@@ -6,7 +6,7 @@ from OpenAI_ThirdLayer import validate_specimen
 from pyzotero import zotero
 
 app = Flask(__name__)
-CORS(app)  # Allow requests from Chrome Extension
+CORS(app)
 
 
 @app.route("/analyze", methods=["POST"])
@@ -61,6 +61,17 @@ def zotero_push():
                 if field and field.lower() != "none":
                     tags.append({"tag": field.strip()})
 
+        authors = data.get("authors", [])
+        creator_list = []
+        if isinstance(authors, list):
+            for name in authors:
+                if name and isinstance(name, str):
+                    creator_list.append({
+                        "creatorType": "author",
+                        "firstName": "",
+                        "lastName": name.strip()
+                    })
+
         item = {
             "itemType": "journalArticle",
             "title": data.get("title", "Untitled"),
@@ -71,7 +82,11 @@ def zotero_push():
             "DOI": data.get("doi", "n/a"),
             "language": data.get("language", "en"),
             "publicationTitle": data.get("journal_title", "Unknown"),
-            "ISSN": data.get("ISSN", "0000-0000")
+            "ISSN": data.get("ISSN", "0000-0000"),
+            "volume": data.get("volume", ""),
+            "issue": data.get("issue", ""),
+            "pages": data.get("pages", ""),
+            "creators": creator_list
         }
 
         response = zot.create_items([item])
