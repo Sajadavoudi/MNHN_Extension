@@ -6,7 +6,7 @@ from OpenAI_ThirdLayer import validate_specimen
 from pyzotero import zotero
 
 app = Flask(__name__)
-CORS(app)  # Allow requests from Chrome Extension
+CORS(app)
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
@@ -47,35 +47,37 @@ def analyze():
 def zotero_push():
     data = request.json
 
-    zot = zotero.Zotero(
-        data["zotero_library_id"],
-        data.get("zotero_type", "user"),
-        data["zotero_key"]
-    )
-
-    tags = []
-    for s in data.get("validated_specimens", []):
-        for field in [s["name"], s["category"], s["subcategory"]]:
-            if field and field.lower() != "none":
-                tags.append({"tag": field})
-
-    item = {
-        "itemType": "journalArticle",
-        "title": data.get("title", "No Title"),
-        "url": data.get("url", ""),
-        "tags": tags,
-        "collections": [],
-        "DOI": data.get("doi", ""),
-        "language": data.get("language", ""),
-        "publicationTitle": data.get("journal", ""),
-        "ISSN": data.get("issn", ""),
-        "date": data.get("date", "")
-    }
-
     try:
+        zot = zotero.Zotero(
+            data.get("zotero_library_id", ""),
+            data.get("zotero_type", "user"),
+            data.get("zotero_key", "")
+        )
+
+        tags = []
+        for s in data.get("validated_specimens", []):
+            for field in [s.get("name", ""), s.get("category", ""), s.get("subcategory", "")]:
+                field = field.strip()
+                if field and field.lower() != "none":
+                    tags.append({"tag": field})
+
+        item = {
+            "itemType": "journalArticle",
+            "title": data.get("title", "Untitled"),
+            "url": data.get("url", "https://example.com"),
+            "tags": tags,
+            "collections": [],
+            "DOI": data.get("doi", "n/a"),
+            "language": data.get("language", "en"),
+            "publicationTitle": data.get("journal_title", "Unknown"),
+            "ISSN": data.get("ISSN", "0000-0000"),
+            "date": data.get("date", "2025-01-01")
+        }
+
         response = zot.create_items([item])
         return jsonify({"status": "success", "response": response})
     except Exception as e:
+        print(f"❌ Error pushing to Zotero: {e}")  # Will show in Railway logs
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
