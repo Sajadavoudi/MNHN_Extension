@@ -6,68 +6,75 @@ client = OpenAI(api_key="sk-proj-2hJ6vMQXUCIiLFzDj7PvXdiCTvUODJCqmn6fLbLmP5ghp3q
 
 # OpenAI Prompt Template
 PROMPT_TEMPLATE = """
-You are an expert in biology and museum collections. Given the specimen name below, classify it into one of these categories and subcategories:
+You are a taxonomy expert working with the MNHN collections (Muséum National d’Histoire Naturelle, Paris).
+
+Your task is to classify the following biological specimen into one of the official MNHN collection categories and subcategories.
+
+Controlled Vocabulary:
 
 1. Géologie:
-    - Minéralogie
-    - Météorites
-    - Roches océaniques
+   - Minéralogie
+   - Météorites
+   - Roches océaniques
 
 2. Paléontologie
 
 3. Botanique
 
 4. Invertébrés non arthropodes terrestres:
-    - Mollusques
-    - Crustacés
-    - Cnidaires
-    - Briozoaires/Brachiopodes
-    - Porifera
-    - Echinodermes
-    - Vers
-    - Polychètes
-    - Meiofaune
-    - Protistes
+   - Mollusques
+   - Crustacés
+   - Cnidaires
+   - Briozoaires/Brachiopodes
+   - Porifera
+   - Echinodermes
+   - Vers
+   - Polychètes
+   - Meiofaune
+   - Protistes
 
 5. Arthropodes terrestres:
-    - Coléoptères
-    - Lépidoptères
-    - Arachnides
-    - Hémiptères
-    - Hyménoptères
-    - Diptères
-    - Odonates
+   - Coléoptères
+   - Lépidoptères
+   - Arachnides
+   - Hémiptères
+   - Hyménoptères
+   - Diptères
+   - Odonates
 
 6. Vertébrés:
-    - Mammifères
-    - Oiseaux
-    - Reptiles et amphibiens
-    - Ichtyologie
+   - Mammifères
+   - Oiseaux
+   - Reptiles et amphibiens
+   - Ichtyologie
 
 7. Préhistoire
 
 8. Ressources biologiques:
-    - Cyanobactéries et microalgues eucaryotes
-    - Souches fongiques
-    - Eucaryotes unicellulaires
-    - Tissus et cellules de vertébrés
-    - Chimiothèque
+   - Cyanobactéries et microalgues eucaryotes
+   - Souches fongiques
+   - Eucaryotes unicellulaires
+   - Tissus et cellules de vertébrés
+   - Chimiothèque
 
 9. Animaux vivants:
-    - PZP
-    - Ménagerie
+   - PZP
+   - Ménagerie
 
 10. Végétaux vivants
 
 11. Anthropologie
 
-Task:
-- If the input is a valid specimen name, return the best-matching category and subcategory (if applicable) in the format: "Category, Subcategory".
-- If the input is not a valid specimen name, return "None".
-- Do not provide explanations or additional text.
+Classification Rules:
+- Return the best-matching “Category, Subcategory” from the list above.
+- If no subcategory exists, return “Category, None”.
+- If the specimen is invalid (not a biological name), return “None”.
+- Never make up subcategories. Use only the exact list above.
+- Return only the result string. No explanations.
 
 Specimen: {specimen}
 """
+
 
 def classify_specimen(specimen_name):
     """
@@ -76,7 +83,7 @@ def classify_specimen(specimen_name):
     try:
         prompt = PROMPT_TEMPLATE.format(specimen=specimen_name)
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o",
             messages=[{"role": "user", "content": prompt}],
             temperature=0
         )
