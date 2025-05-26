@@ -60,7 +60,7 @@ def validate_specimen(specimen_name, category, subcategory):
         )
 
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o",
             messages=[{"role": "user", "content": prompt}],
             temperature=0
         )
