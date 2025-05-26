@@ -6,20 +6,33 @@ client = OpenAI(api_key="sk-proj-2hJ6vMQXUCIiLFzDj7PvXdiCTvUODJCqmn6fLbLmP5ghp3q
 
 # OpenAI Prompt Template
 PROMPT_TEMPLATE = """
-You are an expert in biology and museum collections. Given the paragraph below, determine if it mentions specimens explicitly from the MNHN of Paris (Muséum National d’Histoire Naturelle in Paris) collections.
+You are a biology and taxonomy expert working with historical museum records.
 
-Task:
-1. Check if the paragraph contains a reference to an MNHN collection code (e.g., "MNHN.some_number").
-2. If an MNHN collection code is present, identify the specific scientific name(s) of the specimen(s) explicitly mentioned in the same paragraph.
-   - The name must be a scientific name (e.g., *Genus species*), not a generic description or placeholder.
-3. Return only and only the specific name(s), separated by commas, if linked to an MNHN collection code or if you are sure that it comes from MNHN collection.
-4. If no scientific name is explicitly linked to the MNHN collection code, return "None".
-5. Do not provide explanations, additional text, or metadata.
-6. The specimen should strictly comes from MNHN collecion and not MNHNL, AMNH-M and other collctor, So becarefulm IT SHOULD BE MNHN.
+Your task is to determine if the paragraph below explicitly mentions one or more biological specimens from the MNHN collection (Muséum National d’Histoire Naturelle in Paris).
 
-Paragraph:
+🔎 Specifically:
+
+1. Only consider the specimen(s) if they are explicitly linked to the MNHN collection.
+   - This can include: collection codes (e.g., MNHN.F.12345), phrases like "in the MNHN collection", or specimen accession details.
+
+2. Ignore:
+   - Mentions of MNHN as an institution (e.g., employment, authorship)
+   - Mentions of other collections (e.g., MNHNL, AMNH, NHMUK, ZFMK, or any other)
+   - Cases where the species is discussed but not tied to MNHN
+   - People, affiliations, or vague geographic mentions
+
+3. Return the scientific names (e.g., *Genus species*) of the specimens clearly associated with MNHN.
+
+4. If no such specimens are found, return: None
+
+💬 Paragraph:
+\"\"\"
 {paragraph}
+\"\"\"
+
+Output (only scientific names separated by commas or "None"):
 """
+
 
 def query_mnhn_model(paragraph):
     """
